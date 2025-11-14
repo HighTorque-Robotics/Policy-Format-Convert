@@ -1,4 +1,91 @@
-# 策略模型适配改造：ONNX 转 RKNN/TensorRT
+# Policy Model Adaptation and Transformation: ONNX to RKNN/TensorRT
+
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-20.04-orange.svg)](https://releases.ubuntu.com/20.04/)
+[![Python](https://img.shields.io/badge/python-3.8-blue.svg)](https://docs.python.org/3/whatsnew/3.8.html)
+[![TensorRT](https://img.shields.io/badge/TensorRT-CUDA%20Compatible-silver.svg)](https://developer.nvidia.com/tensorrt)
+[![RKNN](https://img.shields.io/badge/RKNN-Toolkit2-silver.svg)](https://github.com/rockchip-linux/rknn-toolkit2)
+[![License](https://img.shields.io/badge/license-MIT-yellow.svg)](https://opensource.org/license/mit)
+
+## Introduction
+
+Robot policy models trained in simulation (in ONNX format) require adaptation and transformation for efficient deployment on physical hardware. This project provides two targeted conversion solutions:
+- ONNX to RKNN on Ubuntu: Suitable for local deployment scenarios
+- ONNX to TensorRT exclusive for Pi Plus Pro Robot (NVIDIA Jetson Orin Nx version): Leverages hardware computing power to maximize operational efficiency
+No complex configurations are needed—follow the steps to quickly implement the deployment of trained models.
+
+## I. ONNX to RKNN (Local Deployment on Ubuntu)
+
+### Environment Requirements
+- Operating System: Ubuntu 20.04
+- Python Version: 3.8
+- Dependent Tool: Conda (recommended)
+
+### Operation Steps
+#### 1. Create and Activate Conda Environment
+To avoid environment conflicts, create a dedicated environment for RKNN conversion:
+```bash
+conda create -n rknn_model python=3.8
+conda activate rknn_model
+```
+
+#### 2. Install Dependent Packages
+```bash
+pip install rknn-toolkit2
+pip install --upgrade pillow
+```
+
+#### 3. Modify Conversion Script Paths
+Edit the `onnx2rknn.py` script and replace placeholders with actual file paths:
+```python
+# Modify ONNX model loading path
+print("--> Loading model")
+ret = rknn.load_onnx("{your_path_to_load}/your_policy.onnx")  # Replace with your ONNX file path
+
+# Modify RKNN model output path
+OUT_DIR = "{your_path_to_save}"  # Replace with RKNN model save directory
+RKNN_MODEL_PATH = "{}/policy_from_onnx.rknn".format(OUT_DIR)
+```
+
+#### 4. Execute Conversion
+```bash
+python onnx2rknn.py
+```
+
+## II. ONNX to TensorRT (Exclusive for Pi Plus Pro Robot)
+
+### Environment Requirements
+- Hardware Device: Pi Plus Pro Robot (NVIDIA Jetson Orin Nx version)
+- Preinstalled Environment: The device comes with CUDA and TensorRT by default—no additional configuration required
+
+### Operation Steps
+#### 1. Locate the trtexec Tool
+Find the `trtexec` executable file included with TensorRT in the system:
+```bash
+find /usr -name "trtexec"
+```
+
+#### 2. Execute ONNX to TensorRT Conversion
+Use the `trtexec` path obtained in the previous step to run the conversion command (replace with actual paths):
+```bash
+# Example command (replace ONNX input path and TRT output path)
+/usr/src/tensorrt/bin/trtexec \
+--onnx=/home/nvidia/sim2real_master/sim2real_master/install/share/sim2real/policy/up/policy_0326_12dof_4000_pitch.onnx \
+--saveEngine=/home/nvidia/sim2real_master/sim2real_master/install/share/sim2real/policy/up/policy_1023.trt
+```
+
+### Command Parameter Explanation
+- `--onnx`: Specifies the full path to the input ONNX model file
+- `--saveEngine`: Specifies the full path to the output TensorRT engine file (.trt format)
+
+## Deployment Instructions
+After conversion, the following format models can be directly loaded on the corresponding hardware devices:
+- RKNN format: `.rknn` file (suitable for local deployment devices)
+- TensorRT format: `.trt` file (suitable for Pi Plus Pro Robot)
+
+
+
+
+# （中文翻译）策略模型适配改造：ONNX 转 RKNN/TensorRT
 
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-20.04-orange.svg)](https://releases.ubuntu.com/20.04/)
 [![Python](https://img.shields.io/badge/python-3.8-blue.svg)](https://docs.python.org/3/whatsnew/3.8.html)
